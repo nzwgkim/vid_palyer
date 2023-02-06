@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -20,32 +22,53 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  XFile? video;
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: setBoxDecoration(),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.asset('asset/image/logo.png'),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const VideoText(),
-                ]),
+      body: video == null ? renderEmpty() : renderVideo(),
+    );
+  }
+
+  Widget renderVideo() {
+    return const Center(
+        child: Text(
+      'data',
+      style: TextStyle(fontSize: 50),
+    ));
+  }
+
+  Widget renderEmpty() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      decoration: setBoxDecoration(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _Logo(
+            onTap: onTap,
           ),
-        ),
+          const SizedBox(height: 30.0),
+          const VideoText(),
+        ],
       ),
     );
+  }
+
+  onTap() async {
+    final video = await ImagePicker().pickVideo(source: ImageSource.gallery);
+    if (video != null) {
+      this.video = video;
+      setState(() {});
+    }
   }
 
   BoxDecoration setBoxDecoration() {
@@ -59,6 +82,17 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _Logo extends StatelessWidget {
+  final VoidCallback onTap;
+  const _Logo({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: onTap, child: Image.asset('asset/image/logo.png'));
   }
 }
 
