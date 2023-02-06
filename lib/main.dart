@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:vid_player/custom_video_player.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,12 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+//-- video can be null.
+//-- For that case, I use CircularProgressIndicator in the video player.
   Widget renderVideo() {
-    return const Center(
-        child: Text(
-      'data',
-      style: TextStyle(fontSize: 50),
-    ));
+    return CustomeVideoPlayer(video: video);
   }
 
   Widget renderEmpty() {
