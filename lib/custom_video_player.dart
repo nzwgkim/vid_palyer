@@ -14,6 +14,8 @@ class CustomeVideoPlayer extends StatefulWidget {
 
 class _CustomeVideoPlayerState extends State<CustomeVideoPlayer> {
   VideoPlayerController? _videoPlayerController;
+  bool showControls = false;
+  bool isPlaying = false;
 
   initVideoPlayerController() async {
     if (widget.video == null) {
@@ -35,6 +37,114 @@ class _CustomeVideoPlayerState extends State<CustomeVideoPlayer> {
     if (_videoPlayerController == null) {
       return const CircularProgressIndicator();
     }
-    return VideoPlayer(_videoPlayerController!);
+    return AspectRatio(
+      aspectRatio:
+          _videoPlayerController!.value.aspectRatio, // video format을 유지할때
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            showControls = !showControls;
+          });
+        },
+        child: Stack(children: [
+          VideoPlayer(_videoPlayerController!),
+          if (showControls)
+            ControlByIcon(
+                onPressedBack: onPressedBack,
+                onPressedPlay: onPressedPlay,
+                onPressedForward: onPressedForward,
+                isPlaying: _videoPlayerController!.value.isPlaying),
+          Positioned(
+              right: 0,
+              child: IconButton(
+                onPressed: () {
+                  print('home');
+                },
+                icon: const Icon(
+                  Icons.home,
+                  size: 30,
+                  color: Colors.white,
+                ),
+              ))
+        ]),
+      ),
+    );
+    // VideoPlayer(_videoPlayerController!);
+  }
+
+  onPressedBack() {
+    print('Back');
+    final currentPostion = _videoPlayerController!.value.position;
+    Duration position = const Duration();
+
+    if (currentPostion > const Duration(seconds: 3)) {
+      position = currentPostion - const Duration(seconds: 3);
+    }
+    _videoPlayerController!.seekTo(position);
+  }
+
+  onPressedPlay() {
+    // if playing, have to change to stop
+    // if stop, have to change play
+    if (_videoPlayerController!.value.isPlaying) {
+      _videoPlayerController!.pause();
+    } else {
+      _videoPlayerController!.play();
+    }
+    setState(() {});
+  }
+
+  onPressedForward() {
+    print('Forward');
+    final currentPostion = _videoPlayerController!.value.position;
+    Duration position = currentPostion + const Duration(seconds: 3);
+
+    if (position > _videoPlayerController!.value.duration)
+      position = _videoPlayerController!.value.duration;
+
+    _videoPlayerController!.seekTo(position);
+  }
+}
+
+class ControlByIcon extends StatelessWidget {
+  VoidCallback onPressedBack, onPressedPlay, onPressedForward;
+  bool isPlaying;
+  ControlByIcon(
+      {super.key,
+      required this.onPressedBack,
+      required this.onPressedPlay,
+      required this.onPressedForward,
+      required this.isPlaying});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        IconButton(
+          icon: const Icon(
+            Icons.arrow_back_rounded,
+            size: 30,
+            color: Colors.white,
+          ),
+          onPressed: onPressedBack,
+        ),
+        IconButton(
+          icon: Icon(
+            isPlaying ? Icons.pause : Icons.play_arrow,
+            size: 30,
+            color: Colors.white,
+          ),
+          onPressed: onPressedPlay,
+        ),
+        IconButton(
+          icon: const Icon(
+            Icons.arrow_forward_rounded,
+            size: 30,
+            color: Colors.white,
+          ),
+          onPressed: onPressedForward,
+        ),
+      ],
+    );
   }
 }
