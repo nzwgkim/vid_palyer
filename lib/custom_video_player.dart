@@ -16,6 +16,7 @@ class _CustomeVideoPlayerState extends State<CustomeVideoPlayer> {
   VideoPlayerController? _videoPlayerController;
   bool showControls = false;
   bool isPlaying = false;
+  var currentPos = const Duration();
 
   initVideoPlayerController() async {
     if (widget.video == null) {
@@ -65,7 +66,22 @@ class _CustomeVideoPlayerState extends State<CustomeVideoPlayer> {
                   size: 30,
                   color: Colors.white,
                 ),
-              ))
+              )),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            left: 0,
+            child: Slider(
+              value: currentPos.inSeconds.toDouble(),
+              onChanged: (value) {
+                setState(() {
+                  currentPos = Duration(seconds: value.toInt());
+                });
+              },
+              min: 0.0,
+              max: _videoPlayerController!.value.duration.inSeconds.toDouble(),
+            ),
+          )
         ]),
       ),
     );
@@ -74,11 +90,11 @@ class _CustomeVideoPlayerState extends State<CustomeVideoPlayer> {
 
   onPressedBack() {
     print('Back');
-    final currentPostion = _videoPlayerController!.value.position;
+    currentPos = _videoPlayerController!.value.position;
     Duration position = const Duration();
 
-    if (currentPostion > const Duration(seconds: 3)) {
-      position = currentPostion - const Duration(seconds: 3);
+    if (currentPos > const Duration(seconds: 3)) {
+      position = currentPos - const Duration(seconds: 3);
     }
     _videoPlayerController!.seekTo(position);
   }
@@ -96,11 +112,12 @@ class _CustomeVideoPlayerState extends State<CustomeVideoPlayer> {
 
   onPressedForward() {
     print('Forward');
-    final currentPostion = _videoPlayerController!.value.position;
-    Duration position = currentPostion + const Duration(seconds: 3);
+    currentPos = _videoPlayerController!.value.position;
+    Duration position = currentPos + const Duration(seconds: 3);
 
-    if (position > _videoPlayerController!.value.duration)
+    if (position > _videoPlayerController!.value.duration) {
       position = _videoPlayerController!.value.duration;
+    }
 
     _videoPlayerController!.seekTo(position);
   }
