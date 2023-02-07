@@ -42,7 +42,22 @@ class _HomeScreenState extends State<HomeScreen> {
 //-- video can be null.
 //-- For that case, I use CircularProgressIndicator in the video player.
   Widget renderVideo() {
-    return CustomeVideoPlayer(video: video);
+    return CustomVideoPlayer(
+      video: video!,
+      onNewVideoPressed: onNewVideoPressed,
+    );
+  }
+
+  void onNewVideoPressed() async {
+    final video = await ImagePicker().pickVideo(
+      source: ImageSource.gallery,
+    );
+
+    if (video != null) {
+      setState(() {
+        this.video = video;
+      });
+    }
   }
 
   Widget renderEmpty() {
